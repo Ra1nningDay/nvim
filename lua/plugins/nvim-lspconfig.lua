@@ -73,24 +73,24 @@ return {
                 settings = {
                     typescript = {
                         inlayHints = {
-                            includeInlayParameterNameHints = "all",
+                            includeInlayParameterNameHints = "none", -- ปิด
                             includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-                            includeInlayFunctionParameterTypeHints = true,
-                            includeInlayVariableTypeHints = true,
-                            includeInlayPropertyDeclarationTypeHints = true,
-                            includeInlayFunctionLikeReturnTypeHints = true,
-                            includeInlayEnumMemberValueHints = true,
+                            includeInlayFunctionParameterTypeHints = false,
+                            includeInlayVariableTypeHints = false, -- ปิดการแสดง type ของตัวแปร
+                            includeInlayPropertyDeclarationTypeHints = false,
+                            includeInlayFunctionLikeReturnTypeHints = false, -- ปิด return type
+                            includeInlayEnumMemberValueHints = false,
                         },
                     },
                     javascript = {
                         inlayHints = {
-                            includeInlayParameterNameHints = "all",
+                            includeInlayParameterNameHints = "none",
                             includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-                            includeInlayFunctionParameterTypeHints = true,
-                            includeInlayVariableTypeHints = true,
-                            includeInlayPropertyDeclarationTypeHints = true,
-                            includeInlayFunctionLikeReturnTypeHints = true,
-                            includeInlayEnumMemberValueHints = true,
+                            includeInlayFunctionParameterTypeHints = false,
+                            includeInlayVariableTypeHints = false,
+                            includeInlayPropertyDeclarationTypeHints = false,
+                            includeInlayFunctionLikeReturnTypeHints = false,
+                            includeInlayEnumMemberValueHints = false,
                         },
                     },
                 },
