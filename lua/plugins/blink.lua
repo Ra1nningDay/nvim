@@ -1,8 +1,12 @@
 return {
     {
         'saghen/blink.cmp',
+
         -- optional: provides snippets for the snippet source
-        dependencies = { 'rafamadriz/friendly-snippets' },
+        dependencies = {
+            'rafamadriz/friendly-snippets',
+            'giuxtaposition/blink-cmp-copilot',
+        },
 
         -- use a release tag to download pre-built binaries
         version = '1.*',
@@ -45,7 +49,6 @@ return {
                     copilot = {
                         name = "copilot",
                         module = "blink-cmp-copilot",
-                        kind = "Copilot",
                         score_offset = 100,
                         async = true,
                     },
