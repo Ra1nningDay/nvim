@@ -72,6 +72,10 @@ return {
       servers = {
         -- copilot.lua only works with its own copilot lsp server
         copilot = { enabled = false },
+        pyright = {
+          mason = false,
+          autostart = false,
+        },
       },
     },
   },
