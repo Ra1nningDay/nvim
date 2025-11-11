@@ -758,16 +758,48 @@ return {
 	},
 
 	{
+		"nvim-telescope/telescope.nvim",
+		dependencies = { "nvim-lua/plenary.nvim" },
+		event = { "BufReadPre", "BufNewFile" },
+		config = function()
+			local telescope = require("telescope")
+			local builtin = require("telescope.builtin")
+
+			telescope.setup({
+				defaults = {
+					prompt_prefix = "🔍 ",
+					selection_caret = "➤ ",
+					path_display = { "truncate" },
+				},
+			})
+
+			-- keymaps
+			vim.keymap.set("n", "<Space><Space>", function()
+				builtin.find_files({ hidden = true, no_ignore = true })
+			end, { noremap = true, silent = true, desc = "Telescope: Find Files" })
+
+			vim.keymap.set("n", "<Space>/", function()
+				builtin.live_grep({
+					additional_args = function()
+						return { "--hidden" }
+					end,
+				})
+			end, { noremap = true, silent = true, desc = "Telescope: Live Grep" })
+		end,
+	},
+
+	{
 		"nvim-tree/nvim-tree.lua",
 		dependencies = { "nvim-tree/nvim-web-devicons" },
-		event = { "BufReadPre", "BufNewFile" }, -- โหลดเมื่อเปิดไฟล์
+		event = "VeryLazy",
 		init = function()
-			-- ปิด netrw เพื่อใช้ nvim-tree แทน
 			vim.g.loaded_netrw = 1
 			vim.g.loaded_netrwPlugin = 1
 			vim.opt.termguicolors = true
 		end,
 		config = function()
+			local api = require("nvim-tree.api")
+
 			require("nvim-tree").setup({
 				sort_by = "case_sensitive",
 				view = {
@@ -805,23 +837,16 @@ return {
 						},
 					},
 				},
-				filters = {
-					dotfiles = false,
-					custom = { "node_modules", ".cache" },
-				},
-				git = {
-					enable = true,
-					ignore = false,
-					timeout = 500,
-				},
+				filters = { dotfiles = false, custom = { "node_modules", ".cache" } },
+				git = { enable = true, ignore = false, timeout = 500 },
 				actions = {
 					open_file = {
 						quit_on_open = false,
 						resize_window = true,
+						window_picker = { enable = false },
 					},
 				},
 				on_attach = function(bufnr)
-					local api = require("nvim-tree.api")
 					local function opts(desc)
 						return {
 							desc = "nvim-tree: " .. desc,
@@ -831,41 +856,78 @@ return {
 							nowait = true,
 						}
 					end
+
+					vim.api.nvim_buf_set_option(bufnr, "modifiable", true)
+
+					vim.keymap.set("n", "<CR>", api.node.open.edit, opts("Open"))
+					vim.keymap.set("n", "o", api.node.open.edit, opts("Open"))
+					vim.keymap.set("n", "l", api.node.open.edit, opts("Open"))
+					vim.keymap.set("n", "h", api.node.navigate.parent_close, opts("Close Directory"))
+					vim.keymap.set("n", "v", api.node.open.vertical, opts("Open: Vertical Split"))
+					vim.keymap.set("n", "s", api.node.open.horizontal, opts("Open: Horizontal Split"))
+
+					vim.keymap.set("n", "a", api.fs.create, opts("Create File/Dir"))
+					vim.keymap.set("n", "r", api.fs.rename, opts("Rename"))
+					vim.keymap.set("n", "d", api.fs.remove, opts("Delete"))
 				end,
 			})
 
+			-- toggle tree
 			vim.keymap.set("n", "<leader>e", "<cmd>NvimTreeToggle<CR>", { noremap = true, silent = true })
+
+			-- auto open tree when open folder
+			vim.api.nvim_create_autocmd({ "VimEnter" }, {
+				callback = function(data)
+					local directory = vim.fn.isdirectory(data.file) == 1
+					if not directory then
+						return
+					end
+					vim.cmd.cd(data.file)
+					require("nvim-tree.api").tree.open()
+				end,
+			})
 		end,
 	},
 
 	{
-		"nvim-telescope/telescope.nvim",
-		dependencies = { "nvim-lua/plenary.nvim" },
-		event = { "BufReadPre", "BufNewFile" },
+		"akinsho/toggleterm.nvim",
+		version = "*",
 		config = function()
-			local telescope = require("telescope")
-			local builtin = require("telescope.builtin")
+			local ToggleTerm = require("toggleterm.terminal").Terminal
+			local toggleterm = require("toggleterm")
 
-			telescope.setup({
-				defaults = {
-					prompt_prefix = "🔍 ",
-					selection_caret = "➤ ",
-					path_display = { "truncate" },
+			toggleterm.setup({
+				-- default settings
+				hide_numbers = true,
+				shade_terminals = true,
+				start_in_insert = true,
+				insert_mappings = false,
+				persist_size = true,
+				close_on_exit = true,
+				direction = "horizontal", -- default open from bottom
+				size = 20,
+				float_opts = {
+					border = "curved",
+					winblend = 0,
+					width = math.floor(vim.o.columns * 0.8),
+					height = math.floor(vim.o.lines * 0.8),
 				},
 			})
 
-			-- keymaps
-			vim.keymap.set("n", "<Space><Space>", function()
-				builtin.find_files({ hidden = true, no_ignore = true })
-			end, { noremap = true, silent = true, desc = "Telescope: Find Files" })
+			local float_term = ToggleTerm:new({
+				direction = "float",
+				hidden = true,
+			})
 
-			vim.keymap.set("n", "<Space>/", function()
-				builtin.live_grep({
-					additional_args = function()
-						return { "--hidden" }
-					end,
-				})
-			end, { noremap = true, silent = true, desc = "Telescope: Live Grep" })
+			local opts = { noremap = true, silent = true }
+
+			vim.keymap.set("n", "<C-/>", "<cmd>ToggleTerm<CR>", opts)
+
+			vim.keymap.set("n", "<C-\\>", function()
+				float_term:toggle()
+			end, opts)
+
+			vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]], opts)
 		end,
 	},
 }
