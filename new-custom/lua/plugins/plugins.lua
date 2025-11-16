@@ -620,7 +620,7 @@ return {
 			})
 		end,
 	},
-
+    
 	{
 		"folke/noice.nvim",
 		event = "VeryLazy",
@@ -789,107 +789,6 @@ return {
 	},
 
 	{
-		"nvim-tree/nvim-tree.lua",
-		dependencies = { "nvim-tree/nvim-web-devicons" },
-		event = "VeryLazy",
-		init = function()
-			vim.g.loaded_netrw = 1
-			vim.g.loaded_netrwPlugin = 1
-			vim.opt.termguicolors = true
-		end,
-		config = function()
-			local api = require("nvim-tree.api")
-
-			require("nvim-tree").setup({
-				sort_by = "case_sensitive",
-				view = {
-					width = 30,
-					side = "left",
-					number = false,
-					relativenumber = false,
-					signcolumn = "yes",
-				},
-				renderer = {
-					group_empty = true,
-					icons = {
-						glyphs = {
-							default = "",
-							symlink = "",
-							folder = {
-								arrow_closed = "",
-								arrow_open = "",
-								default = "",
-								open = "",
-								empty = "",
-								empty_open = "",
-								symlink = "",
-								symlink_open = "",
-							},
-							git = {
-								unstaged = "✗",
-								staged = "✓",
-								unmerged = "",
-								renamed = "➜",
-								untracked = "★",
-								deleted = "",
-								ignored = "◌",
-							},
-						},
-					},
-				},
-				filters = { dotfiles = false, custom = { "node_modules", ".cache" } },
-				git = { enable = true, ignore = false, timeout = 500 },
-				actions = {
-					open_file = {
-						quit_on_open = false,
-						resize_window = true,
-						window_picker = { enable = false },
-					},
-				},
-				on_attach = function(bufnr)
-					local function opts(desc)
-						return {
-							desc = "nvim-tree: " .. desc,
-							buffer = bufnr,
-							noremap = true,
-							silent = true,
-							nowait = true,
-						}
-					end
-
-					vim.api.nvim_buf_set_option(bufnr, "modifiable", true)
-
-					vim.keymap.set("n", "<CR>", api.node.open.edit, opts("Open"))
-					vim.keymap.set("n", "o", api.node.open.edit, opts("Open"))
-					vim.keymap.set("n", "l", api.node.open.edit, opts("Open"))
-					vim.keymap.set("n", "h", api.node.navigate.parent_close, opts("Close Directory"))
-					vim.keymap.set("n", "v", api.node.open.vertical, opts("Open: Vertical Split"))
-					vim.keymap.set("n", "s", api.node.open.horizontal, opts("Open: Horizontal Split"))
-
-					vim.keymap.set("n", "a", api.fs.create, opts("Create File/Dir"))
-					vim.keymap.set("n", "r", api.fs.rename, opts("Rename"))
-					vim.keymap.set("n", "d", api.fs.remove, opts("Delete"))
-				end,
-			})
-
-			-- toggle tree
-			vim.keymap.set("n", "<leader>e", "<cmd>NvimTreeToggle<CR>", { noremap = true, silent = true })
-
-			-- auto open tree when open folder
-			vim.api.nvim_create_autocmd({ "VimEnter" }, {
-				callback = function(data)
-					local directory = vim.fn.isdirectory(data.file) == 1
-					if not directory then
-						return
-					end
-					vim.cmd.cd(data.file)
-					require("nvim-tree.api").tree.open()
-				end,
-			})
-		end,
-	},
-
-	{
 		"akinsho/toggleterm.nvim",
 		version = "*",
 		config = function()
@@ -928,6 +827,23 @@ return {
 			end, opts)
 
 			vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]], opts)
+		end,
+	},
+
+	{
+		"nvim-tree/nvim-tree.lua",
+		lazy = true, -- Enable lazy loading
+		keys = {
+			{
+				"<C-n>",
+				function()
+					require("nvim-tree.api").tree.toggle()
+				end,
+				desc = "Toggle NvimTree",
+			},
+		},
+		config = function()
+			require("nvim-tree").setup({})
 		end,
 	},
 }

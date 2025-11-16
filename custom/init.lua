@@ -14,12 +14,10 @@ vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 
 vim.keymap.set("n", "<space>st", function()
-    require('telescope.builtin').find_files {
-        cwd = vim.fn.stdpath('config')
-    }
+	require("telescope.builtin").find_files({
+		cwd = vim.fn.stdpath("config"),
+	})
 end)
 
 --vim.keymap.set("n", "<space>te", ":term C:\\Program Files\\Git\\bin\\bash.exe', '--login', '-i",{ noremap = true, silent = true })
 vim.keymap.set("n", "<space>sp", ":vsplit<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<space>bp", ":bprev<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<space>bn", ":bnext<CR>", { noremap = true, silent = true })
